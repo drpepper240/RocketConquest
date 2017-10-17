@@ -29,7 +29,7 @@ namespace Conquest
 				//TODO update player position
 				if (isInside(this.Player.Position, Conquest.instance.Configuration.Instance.zoneMin, Conquest.instance.Configuration.Instance.zoneMax))
 				{
-					Conquest.instance.zoneList.Add(this.Player.CSteamID, this.Player.SteamGroupID.m_SteamID);
+					Conquest.instance.zoneList[this.Player.CSteamID] = this.Player.SteamGroupID.m_SteamID;
 				}
 				else
 				{
