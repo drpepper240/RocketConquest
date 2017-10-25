@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Conquest</RootNamespace>
-    <AssemblyName>ConquestTest</AssemblyName>
+    <AssemblyName>Conquest</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -61,6 +61,7 @@
     <Compile Include="Conquest.cs" />
     <Compile Include="PlayerComponentConquest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Zone.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

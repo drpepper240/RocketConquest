@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Rocket.Unturned.Player;
 using UnityEngine;
+using Rocket.Unturned.Chat;
 
 namespace Conquest
 {
@@ -14,7 +15,7 @@ namespace Conquest
 
 		private bool isInside(Vector3 pos, Vector3 min, Vector3 max)
 		{
-			return (pos.x > min.x && pos.x < max.x && pos.y > min.y && pos.y < max.y); //TODO z axis setting
+			return (pos.x > min.x && pos.x < max.x && pos.y > min.y && pos.y < max.y && pos.z > min.z && pos.z < max.z); //TODO make y axis configurable
 		}
 		private void FixedUpdate()
 		{
@@ -26,14 +27,18 @@ namespace Conquest
 			else
 			{
 				lastUpdatedTicks = 0;
-				//TODO update player position
-				if (isInside(this.Player.Position, Conquest.instance.Configuration.Instance.zoneMin, Conquest.instance.Configuration.Instance.zoneMax))
+
+				foreach (var item in Conquest.instance.Configuration.Instance.CpArray)
 				{
-					Conquest.instance.zoneList[this.Player.CSteamID] = this.Player.SteamGroupID.m_SteamID;
-				}
-				else
-				{
-					Conquest.instance.zoneList.Remove(this.Player.CSteamID);
+					if (item.IsInside(this.Player.Position))
+					{
+						//UnturnedChat.Say(DateTime.Now.ToString("s") + " " + "YARR");
+						item.playerList.Add(this.Player.CSteamID.m_SteamID);
+					}
+					else
+					{
+						item.playerList.Remove(this.Player.CSteamID.m_SteamID);
+					}
 				}
 			}
 		}
