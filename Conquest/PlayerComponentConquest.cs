@@ -12,11 +12,6 @@ namespace Conquest
 	{
 		UInt32 lastUpdatedTicks; //TODO initial value
 
-
-		private bool isInside(Vector3 pos, Vector3 min, Vector3 max)
-		{
-			return (pos.x > min.x && pos.x < max.x && pos.y > min.y && pos.y < max.y && pos.z > min.z && pos.z < max.z); //TODO make y axis configurable
-		}
 		private void FixedUpdate()
 		{
 			if (lastUpdatedTicks < Conquest.instance.Configuration.Instance.ticksUpdatePlayerPosition)

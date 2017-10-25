@@ -35,6 +35,8 @@ namespace Conquest
 
 		public Zone spawnZone;
 
+		public UnityEngine.Color messageColor;
+
 		public void LoadDefaults()
 		{
 			logFileName = @"Logs\TDM.log";
@@ -59,6 +61,8 @@ namespace Conquest
 
 			spawnZone = new ZoneCylinder(new Vector3(-468.0f, 30.0f, 558.5f), 50.0f, 20.0f);
 			spawnZone.name = "Spawn";
+
+			messageColor = new UnityEngine.Color(0, 128, 0, 0);
 		}
 	}
 }

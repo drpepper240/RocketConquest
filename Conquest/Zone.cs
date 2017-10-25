@@ -52,7 +52,10 @@ namespace Conquest
 
 			foreach (var player in playerList)
 			{
-				ulong teamId = UnturnedPlayer.FromCSteamID(new CSteamID(player)).SteamGroupID.m_SteamID;
+				UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(new CSteamID(player));
+				if (uPlayer == null)
+					continue;
+				ulong teamId = uPlayer.SteamGroupID.m_SteamID;
 				if (teamId == Conquest.instance.Configuration.Instance.teamASteamId)
 					playersTeamA += 1;
 				if (teamId == Conquest.instance.Configuration.Instance.teamBSteamId)

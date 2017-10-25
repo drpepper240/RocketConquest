@@ -12,6 +12,7 @@ using Rocket.Unturned;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using Rocket.Unturned.Chat;
+using System.Collections;
 
 namespace Conquest
 {
@@ -43,6 +44,24 @@ namespace Conquest
 
 		private void UnturnedEvents_OnPlayerConnected(UnturnedPlayer player)
 		{
+			if (player.SteamGroupID.m_SteamID == instance.Configuration.Instance.teamASteamId)
+			{
+				UnturnedChat.Say(player.CharacterName + " has joined team A", Conquest.instance.Configuration.Instance.messageColor);
+			}
+			else if (player.SteamGroupID.m_SteamID == instance.Configuration.Instance.teamBSteamId)
+			{
+				UnturnedChat.Say(player.CharacterName + " has joined team B", Conquest.instance.Configuration.Instance.messageColor);
+			}
+			else
+			{
+				UnturnedChat.Say(player.CharacterName + " haven't set their team setting correctly."
+								+ (instance.Configuration.Instance.kickPlayerWithInvalidTeam ? (" Kicking in " + instance.Configuration.Instance.kickDelaySeconds.ToString()) + " seconds" : ""), Conquest.instance.Configuration.Instance.messageColor);
+				if (instance.Configuration.Instance.kickPlayerWithInvalidTeam)
+				{
+					StartCoroutine(KickPlayer(player, instance.Configuration.Instance.kickDelaySeconds, "   To play on this server please select one of these groups as primary in your Unturned settings (Survivors -> Group -> Group):\n"
+						+ instance.Configuration.Instance.teamASteamUri + "    " + instance.Configuration.Instance.teamBSteamUri));
+				}
+			}
 		}
 
 
@@ -69,17 +88,26 @@ namespace Conquest
 
 		private void UpdatePoints()
 		{
+		
 			foreach (var zone in Configuration.Instance.CpArray)
 			{
+				//removing records about players not present
+				zone.playerList.RemoveWhere(p => UnturnedPlayer.FromCSteamID(new CSteamID(p)) == null);
+
+				//TODO remove
 				string str = "Zone " + zone.name + ": ";
 				foreach (var player in zone.playerList)
 				{
-					str = str + UnturnedPlayer.FromCSteamID(new CSteamID(player)).CharacterName.ToString() + ", ";
+					UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(new CSteamID(player));
+					if (uPlayer == null)
+						continue;
+					str = str + uPlayer.CharacterName.ToString() + ", ";
 				}
+				
 				if (zone.playerList.Count > 0)
 					UnturnedChat.Say(DateTime.Now.ToString("s") + " " + str);
 			}
-
+			
 			for (int i = 0; i < Configuration.Instance.CpArray.Length; i++)
 			{
 					Configuration.Instance.CpArray[i].CountPlayersTeams(out int a, out int b);
@@ -176,31 +204,6 @@ namespace Conquest
 		}
 
 
-		//private bool IsPointCapturable(int CpArrayIndex)
-		//{
-		//	if (Configuration.Instance.CpArray.Length < 2)
-		//		return false;
-
-		//	//first point from team A
-		//	if (CpArrayIndex == 0 && Configuration.Instance.CpArray[1].state != Zone.State.TEAMA)
-		//		return true;
-		//	//last point from team A
-		//	if ((CpArrayIndex == Configuration.Instance.CpArray.Length - 1) && Configuration.Instance.CpArray[Configuration.Instance.CpArray.Length - 2].state != Zone.State.TEAMB)
-		//		return true;
-
-		//	if (Configuration.Instance.CpArray.Length < 3)
-		//		return false;
-
-		//	//every other point
-		//	Zone.State prev = Configuration.Instance.CpArray[CpArrayIndex - 1].state;
-		//	Zone.State next = Configuration.Instance.CpArray[CpArrayIndex + 1].state;
-		//	if ((prev == Zone.State.TEAMA && next == Zone.State.TEAMA) || (prev == Zone.State.TEAMB && next == Zone.State.TEAMB))
-		//		return false;
-
-		//	return true;
-		//}
-
-
 		private bool IsPointCapturableByA(int CpArrayIndex)
 		{
 			if (CpArrayIndex == 0)
@@ -224,6 +227,25 @@ namespace Conquest
 		private void UpdateSpawnZone()
 		{
 			//TODO move
+		}
+
+
+		public IEnumerator KickPlayer(UnturnedPlayer player, uint delaySeconds, string reason)
+		{
+			if (player.HasPermission("kick.ignore"))
+			{
+				yield break;
+			}
+			else if (delaySeconds <= 0f)
+			{
+				yield return new WaitForSeconds(1f);
+				player.Kick(reason);
+			}
+			else
+			{
+				yield return new WaitForSeconds(delaySeconds);
+				player.Kick(reason);
+			}
 		}
 	}
 }
