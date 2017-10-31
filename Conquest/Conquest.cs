@@ -13,6 +13,7 @@ using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using Rocket.Unturned.Chat;
 using System.Collections;
+using SDG.Unturned;
 
 namespace Conquest
 {
@@ -30,6 +31,7 @@ namespace Conquest
 			lastUpdatedTicks = 0;
 			U.Events.OnPlayerConnected += UnturnedEvents_OnPlayerConnected;
 			U.Events.OnPlayerDisconnected += UnturnedEvents_OnPlayerDisconnected;
+			UnturnedPlayerEvents.OnPlayerRevive += UnturnedPlayerEvents_OnPlayerRevive;
 		}
 
 
@@ -37,6 +39,7 @@ namespace Conquest
 		{
 			U.Events.OnPlayerConnected -= UnturnedEvents_OnPlayerConnected;
 			U.Events.OnPlayerDisconnected -= UnturnedEvents_OnPlayerDisconnected;
+			UnturnedPlayerEvents.OnPlayerRevive -= UnturnedPlayerEvents_OnPlayerRevive;
 			zoneList = null;
 			instance = null;
 		}
@@ -70,6 +73,19 @@ namespace Conquest
 		}
 
 
+		private void UnturnedPlayerEvents_OnPlayerRevive(UnturnedPlayer player, Vector3 position, byte angle)
+		{
+			if (Conquest.instance.Configuration.Instance.spawnZone.IsInside(position))
+			{
+				postRespawnPlayer(player, true);
+			}
+			else
+			{
+				postRespawnPlayer(player);
+			}
+		}
+
+
 		private void FixedUpdate()
 		{
 			if (lastUpdatedTicks < Conquest.instance.Configuration.Instance.ticksUpdateZone)
@@ -82,6 +98,8 @@ namespace Conquest
 				lastUpdatedTicks = 0;
 
 				UpdatePoints();
+
+				UpdateSpawnZone();
 			}
 		}
 
@@ -92,25 +110,34 @@ namespace Conquest
 			foreach (var zone in Configuration.Instance.CpArray)
 			{
 				//removing records about players not present
-				zone.playerList.RemoveWhere(p => UnturnedPlayer.FromCSteamID(new CSteamID(p)) == null);
+				//zone.playerList.RemoveWhere(p => UnturnedPlayer.FromCSteamID(new CSteamID(p)) == null);
 
 				//TODO remove
+
 				string str = "Zone " + zone.name + ": ";
-				foreach (var player in zone.playerList)
+				bool show = false;
+				foreach (var client in Provider.clients)
 				{
-					UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(new CSteamID(player));
+					if (client.player == null)
+						continue;
+					UnturnedPlayer uPlayer = UnturnedPlayer.FromPlayer(client.player);
 					if (uPlayer == null)
 						continue;
+
+					if (!zone.IsInside(uPlayer.Position))
+						continue;
+
 					str = str + uPlayer.CharacterName.ToString() + ", ";
+					show = true;
 				}
 				
-				if (zone.playerList.Count > 0)
+				if (show)
 					UnturnedChat.Say(DateTime.Now.ToString("s") + " " + str);
 			}
 			
 			for (int i = 0; i < Configuration.Instance.CpArray.Length; i++)
 			{
-					Configuration.Instance.CpArray[i].CountPlayersTeams(out int a, out int b);
+					Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out int a, out int b);
 
 					switch (Configuration.Instance.CpArray[i].state)
 					{
@@ -226,7 +253,35 @@ namespace Conquest
 
 		private void UpdateSpawnZone()
 		{
-			//TODO move
+			foreach (var client in Provider.clients)
+			{
+				if (client.player == null)
+					continue;
+				UnturnedPlayer uPlayer = UnturnedPlayer.FromPlayer(client.player);
+				if (uPlayer == null)
+					continue;
+
+				if (!Conquest.instance.Configuration.Instance.spawnZone.IsInside(uPlayer.Position))
+					continue;
+
+				postRespawnPlayer(uPlayer, true);
+			}
+		}
+
+
+		private void postRespawnPlayer(UnturnedPlayer uPlayer, bool teleport = false)
+		{
+			ulong teamId = uPlayer.SteamGroupID.m_SteamID;
+			if (teamId == Conquest.instance.Configuration.Instance.teamASteamId)
+			{
+				if (teleport)
+					uPlayer.Teleport(Conquest.instance.Configuration.Instance.TeamASpawn, 0);
+			}
+			else if (teamId == Conquest.instance.Configuration.Instance.teamBSteamId)
+			{
+				if (teleport)
+					uPlayer.Teleport(Conquest.instance.Configuration.Instance.TeamBSpawn, 0);
+			}
 		}
 
 

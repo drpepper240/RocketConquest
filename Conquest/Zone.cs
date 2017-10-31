@@ -1,4 +1,5 @@
 ﻿using Rocket.Unturned.Player;
+using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -44,17 +45,23 @@ namespace Conquest
 		}
 
 
-		public void CountPlayersTeams(out int playersTeamA, out int playersTeamB)
+		public void CountPlayersTeamsNow(out int playersTeamA, out int playersTeamB)
 		{
 			playersTeamA = playersTeamB = 0;
 			if (Conquest.instance == null || Conquest.instance.Configuration.Instance == null)
 				return;
 
-			foreach (var player in playerList)
+			foreach (var client in Provider.clients)
 			{
-				UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(new CSteamID(player));
+				if (client.player == null)
+					continue;
+				UnturnedPlayer uPlayer = UnturnedPlayer.FromPlayer(client.player);
 				if (uPlayer == null)
 					continue;
+
+				if (!IsInside(uPlayer.Position))
+					continue;
+
 				ulong teamId = uPlayer.SteamGroupID.m_SteamID;
 				if (teamId == Conquest.instance.Configuration.Instance.teamASteamId)
 					playersTeamA += 1;
