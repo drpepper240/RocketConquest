@@ -22,10 +22,6 @@ namespace Conquest
 		[XmlIgnore]
 		public State prevState;
 
-		//list of players inside the zone
-		[XmlIgnore]
-		public HashSet<ulong> playerList; //PlayerID
-
 		public abstract bool IsInside(Vector3 pos);
 
 		//Capture timer
@@ -39,7 +35,6 @@ namespace Conquest
 		{
 			state = State.NONE;
 			prevState = State.NONE;
-			playerList = new HashSet<ulong>();
 			captureStarted = DateTime.MaxValue;
 			name = "Unnamed Point";
 		}
