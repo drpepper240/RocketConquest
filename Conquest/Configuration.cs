@@ -23,18 +23,22 @@ namespace Conquest
 		public bool kickPlayerWithInvalidTeam;
 		public UInt32 kickDelaySeconds;
 
-		public UInt32 ticksUpdatePlayerPosition;
-
 		public UInt32 ticksUpdateZone;
 
 		public UInt32 secondsCapture;
+
+		//players get experience for capturing control points. Base value is equal to ticks spent in the zone, this is the multiplier
+		public float controlPointExperienceMultiplier;
+
+		//experience for killing another player
+		public UInt32 killPlayerExperience; 
 
 		//Capture points array, in order from team A to team B
 		public Zone[] CpArray;
 
 		public Zone spawnZone;
 
-		public UnityEngine.Color messageColor;
+		public Color messageColor;
 
 		//classes
 		public PlayerClass[] playerClasses;
@@ -56,18 +60,22 @@ namespace Conquest
 
 			secondsCapture = 30;
 
-			CpArray = new Zone[5] { new ZoneBox(new Vector3(-438.0f, 30.0f, 479.0f), new Vector3(-423.0f, 40.0f, 494.0f)),
-									new ZoneBox(new Vector3(-392.0f, 30.0f, 479.0f), new Vector3(-377.0f, 40.0f, 494.0f)),
-									new ZoneBox(new Vector3(-348.0f, 30.0f, 479.0f), new Vector3(-333.0f, 40.0f, 494.0f)),
-									new ZoneBox(new Vector3(-302.0f, 30.0f, 479.0f), new Vector3(-287.0f, 40.0f, 494.0f)),
-									new ZoneBox(new Vector3(-262.0f, 30.0f, 479.0f), new Vector3(-247.0f, 40.0f, 494.0f))	};
+			controlPointExperienceMultiplier = 0.1f;
+
+			killPlayerExperience = 75;
+
+			CpArray = new Zone[5] { new ZoneBox(new Vector3(-438.0f, 30.0f, 479.0f), new Vector3(-423.0f, 40.0f, 494.0f), new Vector3(-431.5f, 40.0f, 486.5f)),
+									new ZoneBox(new Vector3(-392.0f, 30.0f, 479.0f), new Vector3(-377.0f, 40.0f, 494.0f), new Vector3(-384.5f, 40.0f, 486.5f)),
+									new ZoneBox(new Vector3(-348.0f, 30.0f, 479.0f), new Vector3(-333.0f, 40.0f, 494.0f), new Vector3(-440.5f, 40.0f, 486.5f)),
+									new ZoneBox(new Vector3(-302.0f, 30.0f, 479.0f), new Vector3(-287.0f, 40.0f, 494.0f), new Vector3(-494.5f, 40.0f, 486.5f)),
+									new ZoneBox(new Vector3(-262.0f, 30.0f, 479.0f), new Vector3(-247.0f, 40.0f, 494.0f), new Vector3(-464.5f, 40.0f, 486.5f))  };
 			CpArray[0].name = "Alpha";
 			CpArray[1].name = "Bravo";
 			CpArray[2].name = "Charlie";
 			CpArray[3].name = "Delta";
 			CpArray[4].name = "Echo";
 
-			spawnZone = new ZoneCylinder(new Vector3(197.0f, 30.0f, -804.0f), 20.0f, 20.0f);
+			spawnZone = new ZoneCylinder(new Vector3(197.0f, 30.0f, -804.0f), 20.0f, 20.0f, new Vector3(197.0f, 30.0f, -804.0f));
 			spawnZone.name = "Spawn";
 
 			TeamASpawn = new Vector3(200.0f, 58.0f, 800.4f);

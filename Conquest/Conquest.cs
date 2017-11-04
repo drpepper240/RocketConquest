@@ -10,6 +10,7 @@ using Rocket.Unturned.Player;
 using Rocket.Unturned.Chat;
 using System.Collections;
 using SDG.Unturned;
+using Steamworks;
 
 namespace Conquest
 {
@@ -29,6 +30,7 @@ namespace Conquest
 			U.Events.OnPlayerConnected += UnturnedEvents_OnPlayerConnected;
 			U.Events.OnPlayerDisconnected += UnturnedEvents_OnPlayerDisconnected;
 			UnturnedPlayerEvents.OnPlayerRevive += UnturnedPlayerEvents_OnPlayerRevive;
+			UnturnedPlayerEvents.OnPlayerDeath += UnturnedPlayerEvents_OnPlayerDeath;
 		}
 
 
@@ -37,6 +39,7 @@ namespace Conquest
 			U.Events.OnPlayerConnected -= UnturnedEvents_OnPlayerConnected;
 			U.Events.OnPlayerDisconnected -= UnturnedEvents_OnPlayerDisconnected;
 			UnturnedPlayerEvents.OnPlayerRevive -= UnturnedPlayerEvents_OnPlayerRevive;
+			UnturnedPlayerEvents.OnPlayerDeath -= UnturnedPlayerEvents_OnPlayerDeath;
 			playerList = null;
 			instance = null;
 		}
@@ -67,11 +70,17 @@ namespace Conquest
 
 		private void UnturnedEvents_OnPlayerDisconnected(UnturnedPlayer player)
 		{
+			UnturnedChat.Say(player.CharacterName + " left", instance.Configuration.Instance.messageColor);
 		}
 
 
 		private void UnturnedPlayerEvents_OnPlayerRevive(UnturnedPlayer player, Vector3 position, byte angle)
 		{
+			if (!playerList.ContainsKey(player.CSteamID.m_SteamID))
+			{
+				playerList.Add(player.CSteamID.m_SteamID, new PlayerListItem());
+			}
+
 			if (instance.Configuration.Instance.spawnZone.IsInside(position))
 			{
 				TeleportPlayerToSpawn(player);
@@ -84,7 +93,23 @@ namespace Conquest
 		}
 
 
-		private void FixedUpdate()
+		private void UnturnedPlayerEvents_OnPlayerDeath(UnturnedPlayer player, SDG.Unturned.EDeathCause cause, SDG.Unturned.ELimb limb, CSteamID murderer)
+		{
+			if (instance.playerList.ContainsKey(murderer.m_SteamID))
+			{
+				try
+				{
+					UnturnedPlayer.FromCSteamID(murderer).Experience += instance.Configuration.Instance.killPlayerExperience;
+				}
+				catch (Exception)
+				{
+					throw;
+				}
+				
+			}
+		}
+
+			private void FixedUpdate()
 		{
 			if (lastUpdatedTicks < instance.Configuration.Instance.ticksUpdateZone)
 			{
@@ -143,7 +168,7 @@ namespace Conquest
 				return;
 			}
 
-			if (teamAwon)
+			if (teamBwon)
 			{
 				UnturnedChat.Say("Team B won!", instance.Configuration.Instance.messageColor);
 				return;
@@ -152,6 +177,9 @@ namespace Conquest
 			for (int i = 0; i < Configuration.Instance.CpArray.Length; i++)
 			{
 				Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out int a, out int b);
+				//Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out HashSet<UInt64> teamA, out HashSet<UInt64> teamB);
+				//int a = teamA.Count;
+				//int b = teamB.Count;
 
 				switch (Configuration.Instance.CpArray[i].state)
 				{
@@ -240,7 +268,6 @@ namespace Conquest
 					default:
 						break;
 				}
-
 			}
 		}
 
@@ -288,26 +315,6 @@ namespace Conquest
 		{
 			ulong teamId = player.SteamGroupID.m_SteamID;
 
-			if (instance.playerList[player.CSteamID.m_SteamID].spawnAtBase)
-			{
-				if (teamId == instance.Configuration.Instance.teamASteamId)
-				{
-					player.Teleport(instance.Configuration.Instance.TeamASpawn, 0);
-					return;
-				}
-
-				if (teamId == instance.Configuration.Instance.teamBSteamId)
-				{
-					player.Teleport(instance.Configuration.Instance.TeamBSpawn, 0);
-					return;
-				}
-			}
-			else
-			{
-			}
-
-
-
 			if (teamId == instance.Configuration.Instance.teamASteamId)
 			{
 				int farthestPoint = -1;
@@ -318,9 +325,11 @@ namespace Conquest
 				}
 				if (farthestPoint != -1 && !instance.playerList[player.CSteamID.m_SteamID].spawnAtBase)
 				{
-					//TODO teleport to control point farthestPoint
+					player.Teleport(instance.Configuration.Instance.CpArray[farthestPoint].m_spawn, 0);
 					return;
-				} else {
+				}
+				else
+				{
 					player.Teleport(instance.Configuration.Instance.TeamASpawn, 0);
 					return;
 				}
@@ -336,7 +345,7 @@ namespace Conquest
 				}
 				if (farthestPoint != -1 && !instance.playerList[player.CSteamID.m_SteamID].spawnAtBase)
 				{
-					//TODO teleport to control point farthestPoint
+					player.Teleport(instance.Configuration.Instance.CpArray[farthestPoint].m_spawn, 0);
 					return;
 				}
 				else
@@ -345,7 +354,6 @@ namespace Conquest
 					return;
 				}
 			}
-
 		}
 
 

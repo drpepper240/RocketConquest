@@ -1,10 +1,7 @@
 ﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
-using Steamworks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 using UnityEngine;
 
@@ -29,6 +26,9 @@ namespace Conquest
 		public DateTime captureStarted;
 
 		public string name;
+
+		//spawn point
+		public Vector3 m_spawn;
 
 		//default constructor
 		public Zone()
@@ -64,6 +64,33 @@ namespace Conquest
 					playersTeamB += 1;
 			}
 		}
+
+
+		public void CountPlayersTeamsNow(out HashSet<UInt64> playersTeamAIDs, out HashSet<UInt64> playersTeamBIDs)
+		{
+			playersTeamAIDs = new HashSet<ulong>();
+			playersTeamBIDs = new HashSet<ulong>();
+			if (Conquest.instance == null || Conquest.instance.Configuration.Instance == null)
+				return;
+
+			foreach (var client in Provider.clients)
+			{
+				if (client.player == null)
+					continue;
+				UnturnedPlayer uPlayer = UnturnedPlayer.FromPlayer(client.player);
+				if (uPlayer == null)
+					continue;
+
+				if (!IsInside(uPlayer.Position))
+					continue;
+
+				ulong teamId = uPlayer.SteamGroupID.m_SteamID;
+				if (teamId == Conquest.instance.Configuration.Instance.teamASteamId)
+					playersTeamAIDs.Add(uPlayer.CSteamID.m_SteamID);
+				if (teamId == Conquest.instance.Configuration.Instance.teamBSteamId)
+					playersTeamBIDs.Add(uPlayer.CSteamID.m_SteamID);
+			}
+		}
 	}
 
 	public class ZoneBox : Zone
@@ -73,10 +100,11 @@ namespace Conquest
 
 		public ZoneBox() { }
 
-		public ZoneBox(Vector3 min, Vector3 max)
+		public ZoneBox(Vector3 min, Vector3 max, Vector3 spawn)
 		{
 			m_min = min;
 			m_max = max;
+			m_spawn = spawn;
 		}
 
 		public override bool IsInside(Vector3 pos)
@@ -93,11 +121,12 @@ namespace Conquest
 
 		public ZoneCylinder() { }
 
-		public ZoneCylinder(Vector3 center, float r, float h)
+		public ZoneCylinder(Vector3 center, float r, float h, Vector3 spawn)
 		{
 			m_center = center;
 			m_r = r;
 			m_h = h;
+			m_spawn = spawn;
 		}
 
 		public override bool IsInside(Vector3 pos)

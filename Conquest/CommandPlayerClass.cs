@@ -54,6 +54,13 @@ namespace Conquest
 
 			if (command == null || command.Length != 1)
 			{
+				string classes = "";
+				for (int i = 0; i < Conquest.instance.Configuration.Instance.playerClasses.Length; i++)
+				{
+					classes = classes + Conquest.instance.Configuration.Instance.playerClasses[i].name;
+					if (i != Conquest.instance.Configuration.Instance.playerClasses.Length - 1)
+						classes = classes + " | ";
+				}
 				UnturnedChat.Say(caller, "Usage: /class [class1 | class2 | class3]", Conquest.instance.Configuration.Instance.messageColor); //TODO class list
 				return;
 			}

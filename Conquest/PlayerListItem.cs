@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Conquest
+﻿namespace Conquest
 {
 	public class PlayerListItem
 	{
