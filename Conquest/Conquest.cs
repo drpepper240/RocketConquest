@@ -97,19 +97,20 @@ namespace Conquest
 		{
 			if (instance.playerList.ContainsKey(murderer.m_SteamID))
 			{
-				try
-				{
-					UnturnedPlayer.FromCSteamID(murderer).Experience += instance.Configuration.Instance.killPlayerExperience;
-				}
-				catch (Exception)
-				{
-					throw;
-				}
-				
+				if (murderer.m_SteamID != player.CSteamID.m_SteamID)
+					try
+					{
+						UnturnedPlayer.FromCSteamID(murderer).Experience += instance.Configuration.Instance.killPlayerExperience;
+					}
+					catch (Exception)
+					{
+						throw;
+					}
+
 			}
 		}
 
-			private void FixedUpdate()
+		private void FixedUpdate()
 		{
 			if (lastUpdatedTicks < instance.Configuration.Instance.ticksUpdateZone)
 			{

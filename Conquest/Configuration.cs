@@ -70,10 +70,12 @@ namespace Conquest
 									new ZoneBox(new Vector3(-302.0f, 30.0f, 479.0f), new Vector3(-287.0f, 40.0f, 494.0f), new Vector3(-494.5f, 40.0f, 486.5f)),
 									new ZoneBox(new Vector3(-262.0f, 30.0f, 479.0f), new Vector3(-247.0f, 40.0f, 494.0f), new Vector3(-464.5f, 40.0f, 486.5f))  };
 			CpArray[0].name = "Alpha";
+			CpArray[0].state = Zone.State.TEAMA;
 			CpArray[1].name = "Bravo";
 			CpArray[2].name = "Charlie";
 			CpArray[3].name = "Delta";
 			CpArray[4].name = "Echo";
+			CpArray[4].state = Zone.State.TEAMB;
 
 			spawnZone = new ZoneCylinder(new Vector3(197.0f, 30.0f, -804.0f), 20.0f, 20.0f, new Vector3(197.0f, 30.0f, -804.0f));
 			spawnZone.name = "Spawn";
@@ -94,7 +96,7 @@ namespace Conquest
 												new PlayerClass("Marksman",
 												new ushort[] {235, 236, 81, 394, 394, 394, 388,     433, 238,                       1018, 1020, 1020, 1020, 148, 1021, 1022, 1022, 1483 })
 												};
-			defaultPlayerClassIndex = 3;
+			defaultPlayerClassIndex = 2;
 		}
 	}
 }

@@ -54,7 +54,7 @@ namespace Conquest
 
 			if (command == null || command.Length != 1)
 			{
-				UnturnedChat.Say(caller, "Set spawn point for next non-bedroll respawns. Usage: /spawn [base | point]", Conquest.instance.Configuration.Instance.messageColor);
+				UnturnedChat.Say(caller, "Set spawn point for all your following non-bedroll respawns. Usage: /spawn [base | point]", Conquest.instance.Configuration.Instance.messageColor);
 				return;
 			}
 
@@ -67,7 +67,7 @@ namespace Conquest
 
 			if (command[0] == "point")
 			{
-				Conquest.instance.playerList[player.CSteamID.m_SteamID].spawnAtBase = true;
+				Conquest.instance.playerList[player.CSteamID.m_SteamID].spawnAtBase = false;
 				UnturnedChat.Say(caller, "Next time you'll respawn at the farthest captured control point ", Conquest.instance.Configuration.Instance.messageColor);
 				return;
 			}
