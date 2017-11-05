@@ -246,7 +246,7 @@ namespace Conquest
 
 					case Zone.State.TEAMA:
 						{
-							if (IsPointCapturableByB(i) && (a == 0 || b > 0))
+							if (IsPointCapturableByB(i) && a == 0 && b > 0)
 							{
 								UnturnedChat.Say("Team B started capturing point " + Configuration.Instance.CpArray[i].name, instance.Configuration.Instance.messageColor);
 								Configuration.Instance.CpArray[i].state = Zone.State.TEAMB_C;
@@ -258,7 +258,7 @@ namespace Conquest
 
 					case Zone.State.TEAMB:
 						{
-							if (IsPointCapturableByA(i) && (a > 0 || b == 0))
+							if (IsPointCapturableByA(i) && a > 0 && b == 0)
 							{
 								UnturnedChat.Say("Team A started capturing point " + Configuration.Instance.CpArray[i].name, instance.Configuration.Instance.messageColor);
 								Configuration.Instance.CpArray[i].state = Zone.State.TEAMA_C;
@@ -307,6 +307,11 @@ namespace Conquest
 
 				if (!instance.Configuration.Instance.spawnZone.IsInside(uPlayer.Position))
 					continue;
+
+				if (!playerList.ContainsKey(uPlayer.CSteamID.m_SteamID))
+				{
+					playerList.Add(uPlayer.CSteamID.m_SteamID, new PlayerListItem());
+				}
 
 				StartCoroutine(TeleportPlayerToSpawn(uPlayer, false));
 			}
