@@ -22,9 +22,24 @@ namespace Conquest
 			get { return AllowedCaller.Player; }
 		}
 
+		private string GetUsageString()
+		{
+			string usage = "Usage: /class [class1 | class2 | class3]";
+			if (Conquest.instance == null || Conquest.instance.Configuration.Instance == null || Conquest.instance.Configuration.Instance.playerClasses == null || Conquest.instance.Configuration.Instance.playerClasses.Length == 0)
+				return usage;
+			usage = "";
+			for (int i = 0; i < Conquest.instance.Configuration.Instance.playerClasses.Length; i++)
+			{
+				usage = usage + Conquest.instance.Configuration.Instance.playerClasses[i].name;
+				if (i != Conquest.instance.Configuration.Instance.playerClasses.Length - 1)
+					usage = usage + " | ";
+			}
+			return "Usage: /class [" + usage + "]";
+		}
+
 		public string Syntax
 		{
-			get { return "Usage: /class [class1 | class2 | class3]"; }
+			get { return GetUsageString(); }
 		}
 
 		public List<string> Aliases
@@ -54,14 +69,7 @@ namespace Conquest
 
 			if (command == null || command.Length != 1)
 			{
-				string classes = "";
-				for (int i = 0; i < Conquest.instance.Configuration.Instance.playerClasses.Length; i++)
-				{
-					classes = classes + Conquest.instance.Configuration.Instance.playerClasses[i].name;
-					if (i != Conquest.instance.Configuration.Instance.playerClasses.Length - 1)
-						classes = classes + " | ";
-				}
-				UnturnedChat.Say(caller, "Usage: /class [" + classes + "]", Conquest.instance.Configuration.Instance.messageColor); //TODO class list
+				UnturnedChat.Say(caller, GetUsageString(), Conquest.instance.Configuration.Instance.messageColor);
 				return;
 			}
 

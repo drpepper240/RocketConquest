@@ -97,6 +97,11 @@ namespace Conquest
 												new ushort[] {235, 236, 81, 394, 394, 394, 388,     433, 238,                       1018, 1020, 1020, 1020, 148, 1021, 1022, 1022, 1483 })
 												};
 			defaultPlayerClassIndex = 2;
+			playerClasses[0].skills = new string[] { "Crafting", "Mechanic", "Engineer" };
+			playerClasses[1].skills = new string[] { "Immunity", "Healing", "Exercise" };
+			playerClasses[2].skills = new string[] { "Exercise", "Strength" };
+			playerClasses[3].skills = new string[] { "Dexterity", "Vitality", "Survival" };
+			playerClasses[4].skills = new string[] { "Sharpshooter", "Dexterity", "Survival" };
 		}
 	}
 }

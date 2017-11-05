@@ -11,6 +11,7 @@ using Rocket.Unturned.Chat;
 using System.Collections;
 using SDG.Unturned;
 using Steamworks;
+using Rocket.Unturned.Skills;
 
 namespace Conquest
 {
@@ -350,19 +351,21 @@ namespace Conquest
 				{
 					player.Teleport(instance.Configuration.Instance.TeamBSpawn, 0);
 				}
-			} else {
+			}
+			else
+			{
 				yield break;
 			}
 
 			if (fillInventory)
-				yield return StartCoroutine(FillPlayerInventory(player));
+				yield return StartCoroutine(FillPlayerInventoryAndSkill(player));
 			else
 				yield break;
 		}
 
 
 		//player should be in a playerList
-		public IEnumerator FillPlayerInventory(UnturnedPlayer player)
+		public IEnumerator FillPlayerInventoryAndSkill(UnturnedPlayer player)
 		{
 			//player.GiveItem(UnturnedItems.AssembleItem(1018,
 			//										   30, // clipsize
@@ -384,6 +387,17 @@ namespace Conquest
 					player.GiveItem(item, 1);
 				}
 			}
+
+			foreach (var item in instance.Configuration.Instance.playerClasses[classId].skills)
+			{
+				UnturnedSkill skill = PlayerClass.GetUnturnedSkillByName(item);
+
+				if (skill != null)
+				{
+					player.SetSkillLevel(skill, player.GetSkill(skill).max);
+				}
+			}
+
 			yield break;
 		}
 
