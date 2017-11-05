@@ -83,12 +83,13 @@ namespace Conquest
 
 			if (instance.Configuration.Instance.spawnZone.IsInside(position))
 			{
-				TeleportPlayerToSpawn(player);
-				FillPlayerInventory(player);
+				//TeleportPlayerToSpawn(player);
+				//FillPlayerInventory(player);
+				StartCoroutine(TeleportPlayerToSpawn(player, true));
 			}
 			else
 			{
-				FillPlayerInventory(player);
+				StartCoroutine(TeleportPlayerToSpawn(player, false));
 			}
 		}
 
@@ -306,13 +307,13 @@ namespace Conquest
 				if (!instance.Configuration.Instance.spawnZone.IsInside(uPlayer.Position))
 					continue;
 
-				TeleportPlayerToSpawn(uPlayer);
+				StartCoroutine(TeleportPlayerToSpawn(uPlayer, false));
 			}
 		}
 
 
 		//player should be in a playerList
-		private void TeleportPlayerToSpawn(UnturnedPlayer player)
+		public IEnumerator TeleportPlayerToSpawn(UnturnedPlayer player, bool fillInventory)
 		{
 			ulong teamId = player.SteamGroupID.m_SteamID;
 
@@ -327,16 +328,13 @@ namespace Conquest
 				if (farthestPoint != -1 && !instance.playerList[player.CSteamID.m_SteamID].spawnAtBase)
 				{
 					player.Teleport(instance.Configuration.Instance.CpArray[farthestPoint].m_spawn, 0);
-					return;
 				}
 				else
 				{
 					player.Teleport(instance.Configuration.Instance.TeamASpawn, 0);
-					return;
 				}
 			}
-
-			if (teamId == instance.Configuration.Instance.teamASteamId)
+			else if (teamId == instance.Configuration.Instance.teamASteamId)
 			{
 				int farthestPoint = -1;
 				for (int i = Configuration.Instance.CpArray.Length - 1; i >= 0; i++)
@@ -347,19 +345,24 @@ namespace Conquest
 				if (farthestPoint != -1 && !instance.playerList[player.CSteamID.m_SteamID].spawnAtBase)
 				{
 					player.Teleport(instance.Configuration.Instance.CpArray[farthestPoint].m_spawn, 0);
-					return;
 				}
 				else
 				{
 					player.Teleport(instance.Configuration.Instance.TeamBSpawn, 0);
-					return;
 				}
+			} else {
+				yield break;
 			}
+
+			if (fillInventory)
+				yield return StartCoroutine(FillPlayerInventory(player));
+			else
+				yield break;
 		}
 
 
 		//player should be in a playerList
-		private void FillPlayerInventory(UnturnedPlayer player)
+		public IEnumerator FillPlayerInventory(UnturnedPlayer player)
 		{
 			//player.GiveItem(UnturnedItems.AssembleItem(1018,
 			//										   30, // clipsize
@@ -381,6 +384,7 @@ namespace Conquest
 					player.GiveItem(item, 1);
 				}
 			}
+			yield break;
 		}
 
 
