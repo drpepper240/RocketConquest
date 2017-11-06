@@ -58,20 +58,20 @@ namespace Conquest
 
 			ticksUpdateZone = 50;
 
-			secondsCapture = 30;
+			secondsCapture = 120;
 
-			controlPointExperienceMultiplier = 0.1f;
+			controlPointExperienceMultiplier = 0.02f;
 
 			killPlayerExperience = 75;
 
 			CpArray = new Zone[] { new ZoneBox(new Vector3(-141.0f, 52.0f, 399.0f), new Vector3(-119.0f, 62.0f, 421.0f), new Vector3(-130.0f, 56.0f, 409.0f)),
-									new ZoneBox(new Vector3(-267.0f, 33.0f, -5.0f), new Vector3(-231.0f, 48.0f, 33.0f), new Vector3(-242.5f, 40.0f, 2.5f)),
+									new ZoneBox(new Vector3(-267.5f, 33.0f, -5.5f), new Vector3(-231.0f, 48.0f, 33.0f), new Vector3(-242.5f, 40.0f, 2.5f)),
 									new ZoneBox(new Vector3(117.0f, 50.0f, -31.5f), new Vector3(139.0f, 60.0f, -9.5f), new Vector3(129.5f, 53.5f, -21.5f))  };
 			CpArray[0].name = "Alpha";
-			CpArray[0].state = Zone.State.TEAMA;
+			//CpArray[0].state = Zone.State.TEAMA;
 			CpArray[1].name = "Bravo";
 			CpArray[2].name = "Charlie";
-			CpArray[2].state = Zone.State.TEAMB;
+			//CpArray[2].state = Zone.State.TEAMB;
 
 			spawnZone = new ZoneCylinder(new Vector3(197.0f, 30.0f, -804.0f), 20.0f, 20.0f, new Vector3(197.0f, 30.0f, -804.0f));
 			spawnZone.name = "Spawn";

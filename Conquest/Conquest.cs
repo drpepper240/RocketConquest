@@ -340,10 +340,10 @@ namespace Conquest
 					player.Teleport(instance.Configuration.Instance.TeamASpawn, 0);
 				}
 			}
-			else if (teamId == instance.Configuration.Instance.teamASteamId)
+			else if (teamId == instance.Configuration.Instance.teamBSteamId)
 			{
 				int farthestPoint = -1;
-				for (int i = Configuration.Instance.CpArray.Length - 1; i >= 0; i++)
+				for (int i = Configuration.Instance.CpArray.Length - 1; i >= 0; i--)
 				{
 					if (Configuration.Instance.CpArray[i].state == Zone.State.TEAMB)
 						farthestPoint = i;
