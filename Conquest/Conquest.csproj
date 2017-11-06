@@ -59,6 +59,7 @@
     <Compile Include="CommandPlayerClass.cs" />
     <Compile Include="CommandGetCoordinates.cs" />
     <Compile Include="CommandSpawn.cs" />
+    <Compile Include="CommandStatus.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Conquest.cs" />
     <Compile Include="PlayerClass.cs" />
