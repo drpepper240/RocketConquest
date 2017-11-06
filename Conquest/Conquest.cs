@@ -77,20 +77,14 @@ namespace Conquest
 
 		private void UnturnedPlayerEvents_OnPlayerRevive(UnturnedPlayer player, Vector3 position, byte angle)
 		{
-			if (!playerList.ContainsKey(player.CSteamID.m_SteamID))
-			{
-				playerList.Add(player.CSteamID.m_SteamID, new PlayerListItem());
-			}
-
 			if (instance.Configuration.Instance.spawnZone.IsInside(position))
 			{
-				//TeleportPlayerToSpawn(player);
-				//FillPlayerInventory(player);
-				StartCoroutine(TeleportPlayerToSpawn(player, true));
+				//let UpdateSpawnZone() do everything
 			}
 			else
 			{
-				StartCoroutine(TeleportPlayerToSpawn(player, false));
+				//bedroll
+				postSpawnPlayer(player, false, true, true);
 			}
 		}
 
@@ -179,10 +173,10 @@ namespace Conquest
 
 			for (int i = 0; i < Configuration.Instance.CpArray.Length; i++)
 			{
-				Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out int a, out int b);
-				//Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out HashSet<UInt64> teamA, out HashSet<UInt64> teamB);
-				//int a = teamA.Count;
-				//int b = teamB.Count;
+				//Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out int a, out int b);
+				Configuration.Instance.CpArray[i].CountPlayersTeamsNow(out HashSet<UnturnedPlayer> teamA, out HashSet<UnturnedPlayer> teamB);
+				int a = teamA.Count;
+				int b = teamB.Count;
 
 				switch (Configuration.Instance.CpArray[i].state)
 				{
@@ -220,7 +214,12 @@ namespace Conquest
 							{
 								UnturnedChat.Say("Team A captured point " + Configuration.Instance.CpArray[i].name, instance.Configuration.Instance.messageColor);
 								Configuration.Instance.CpArray[i].state = Zone.State.TEAMA;
+								GiveExperienceToPlayers(teamA, instance.Configuration.Instance.controlPointExperienceCapture);
 								break;
+							}
+							else
+							{
+								GiveExperienceToPlayers(teamA, Convert.ToUInt32(instance.Configuration.Instance.ticksUpdateZone * instance.Configuration.Instance.controlPointExperienceMultiplier));
 							}
 
 							break;
@@ -239,7 +238,12 @@ namespace Conquest
 							{
 								UnturnedChat.Say("Team B captured point " + Configuration.Instance.CpArray[i].name, instance.Configuration.Instance.messageColor);
 								Configuration.Instance.CpArray[i].state = Zone.State.TEAMB;
+								GiveExperienceToPlayers(teamB, instance.Configuration.Instance.controlPointExperienceCapture);
 								break;
+							}
+							else
+							{
+								GiveExperienceToPlayers(teamB, Convert.ToUInt32(instance.Configuration.Instance.ticksUpdateZone * instance.Configuration.Instance.controlPointExperienceMultiplier));
 							}
 							break;
 						}
@@ -271,6 +275,15 @@ namespace Conquest
 					default:
 						break;
 				}
+			}
+		}
+
+
+		public void GiveExperienceToPlayers(HashSet<UnturnedPlayer> players, uint expAmountToEach)
+		{
+			foreach (UnturnedPlayer p in players)
+			{
+				p.Experience += expAmountToEach;
 			}
 		}
 
@@ -308,18 +321,26 @@ namespace Conquest
 				if (!instance.Configuration.Instance.spawnZone.IsInside(uPlayer.Position))
 					continue;
 
-				if (!playerList.ContainsKey(uPlayer.CSteamID.m_SteamID))
-				{
-					playerList.Add(uPlayer.CSteamID.m_SteamID, new PlayerListItem());
-				}
-
-				StartCoroutine(TeleportPlayerToSpawn(uPlayer, false));
+				postSpawnPlayer(uPlayer, true, true, true);
 			}
 		}
 
 
+		private void postSpawnPlayer(UnturnedPlayer player, bool teleport, bool fillInventory, bool giveSkills)
+		{
+			if (!playerList.ContainsKey(player.CSteamID.m_SteamID))
+			{
+				playerList.Add(player.CSteamID.m_SteamID, new PlayerListItem());
+			}
+
+			FillPlayerInventoryAndSkill(player);
+
+			StartCoroutine(TeleportPlayerToSpawn(player));
+		}
+
+		
 		//player should be in a playerList
-		public IEnumerator TeleportPlayerToSpawn(UnturnedPlayer player, bool fillInventory)
+		public IEnumerator TeleportPlayerToSpawn(UnturnedPlayer player)
 		{
 			ulong teamId = player.SteamGroupID.m_SteamID;
 
@@ -361,16 +382,11 @@ namespace Conquest
 			{
 				yield break;
 			}
-
-			if (fillInventory)
-				yield return StartCoroutine(FillPlayerInventoryAndSkill(player));
-			else
-				yield break;
 		}
 
 
 		//player should be in a playerList
-		public IEnumerator FillPlayerInventoryAndSkill(UnturnedPlayer player)
+		public void FillPlayerInventoryAndSkill(UnturnedPlayer player)
 		{
 			//player.GiveItem(UnturnedItems.AssembleItem(1018,
 			//										   30, // clipsize
@@ -403,7 +419,7 @@ namespace Conquest
 				}
 			}
 
-			yield break;
+			return;
 		}
 
 

@@ -66,10 +66,10 @@ namespace Conquest
 		}
 
 
-		public void CountPlayersTeamsNow(out HashSet<UInt64> playersTeamAIDs, out HashSet<UInt64> playersTeamBIDs)
+		public void CountPlayersTeamsNow(out HashSet<UnturnedPlayer> playersTeamA, out HashSet<UnturnedPlayer> playersTeamB)
 		{
-			playersTeamAIDs = new HashSet<ulong>();
-			playersTeamBIDs = new HashSet<ulong>();
+			playersTeamA = new HashSet<UnturnedPlayer>();
+			playersTeamB = new HashSet<UnturnedPlayer>();
 			if (Conquest.instance == null || Conquest.instance.Configuration.Instance == null)
 				return;
 
@@ -86,9 +86,9 @@ namespace Conquest
 
 				ulong teamId = uPlayer.SteamGroupID.m_SteamID;
 				if (teamId == Conquest.instance.Configuration.Instance.teamASteamId)
-					playersTeamAIDs.Add(uPlayer.CSteamID.m_SteamID);
+					playersTeamA.Add(uPlayer);
 				if (teamId == Conquest.instance.Configuration.Instance.teamBSteamId)
-					playersTeamBIDs.Add(uPlayer.CSteamID.m_SteamID);
+					playersTeamB.Add(uPlayer);
 			}
 		}
 	}
